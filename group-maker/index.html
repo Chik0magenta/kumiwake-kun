@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'none'; img-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Kumiwake-kun · 組み分けくん</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">組</span><div><strong>組み分けくん</strong><span>Kumiwake-kun</span></div></div>
+    <span class="local-badge"><span data-i18n="local">このブラウザ内でのみ処理</span></span>
+  </header>
+  <nav class="language-switch" aria-label="Language"><button type="button" data-language="ja" lang="ja" aria-pressed="true">日本語</button><button type="button" data-language="ko" lang="ko" aria-pressed="false">한국어</button></nav>
+  <main>
+    <ol class="steps" aria-label="進行状況" data-i18n-aria="stepsLabel">
+      <li aria-current="step"><span>01</span> <span data-i18n="rosterStep">名簿入力</span></li>
+      <li><span>02</span> <span data-i18n="attendanceTitle">今日の出欠</span></li>
+      <li><span>03</span> <span data-i18n="resultsStep">グループ分け結果</span></li>
+    </ol>
+
+    <section id="roster-screen" aria-labelledby="roster-title">
+      <div class="page-heading"><p class="eyebrow"><span data-i18n="prepare">授業の準備</span></p><h1 id="roster-title" tabindex="-1"><span data-i18n="rosterTitle">今日は誰と話しましょう？</span></h1><p><span data-i18n="rosterIntro">名簿を入力して、今日のグループを作りましょう。</span></p></div>
+      <div class="roster-layout">
+        <form id="roster-form" class="panel">
+          <div class="field-heading"><label for="student-names"><span data-i18n="rosterLabel">学生名簿</span></label><span><span data-i18n="onePerLine">1行に1人</span></span></div>
+          <div class="file-import"><label for="roster-file" data-i18n="fileLabel">TXT名簿を読み込む</label><input id="roster-file" type="file" accept=".txt,text/plain" aria-describedby="file-hint file-status file-error"><p id="file-hint" class="hint" data-i18n="fileHint">UTF-8・1行に1人。読み込み後に「名簿を反映」を押してください。</p><p id="file-status" class="hint" role="status"></p><p id="file-error" class="error" role="alert"></p></div>
+          <textarea id="student-names" rows="11" placeholder="例：学生あ&#10;学生い&#10;学生う" data-i18n-placeholder="placeholder" autocomplete="off" spellcheck="false" aria-describedby="roster-hint roster-error"></textarea>
+          <p id="roster-hint" class="hint"><span data-i18n="rosterHint">空行は無視し、同姓同名の学生も別々に扱います。</span></p>
+          <p id="roster-error" class="error" role="alert"></p>
+          <div class="form-bottom"><span><span data-i18n="resetHint">名簿を反映すると、全員出席で始まります。</span></span><button class="primary" type="submit"><span data-i18n="applyRoster">名簿を反映</span> <span aria-hidden="true">→</span></button></div>
+        </form>
+        <aside class="guide"><p class="eyebrow"><span data-i18n="threeSteps">かんたん3ステップ</span></p><h2><span data-i18n="guideTitle">グループ分けは手早く、会話の時間はたっぷり。</span></h2><ol><li><strong><span data-i18n="guideOne">名簿を入力</span></strong><p><span data-i18n="guideOneHint">名前の貼り付けやTXTファイルの読み込みができます。</span></p></li><li><strong><span data-i18n="guideTwo">欠席者を確認</span></strong><p><span data-i18n="guideTwoHint">学生を押すと出欠が切り替わります。</span></p></li><li><strong><span data-i18n="guideThree">グループを作って表示</span></strong><p><span data-i18n="guideThreeHint">ランダムに、人数が均等になるように分けます。</span></p></li></ol><p class="guide-note"><span data-i18n="sessionHint">ページを再読み込みするか閉じると、名簿は消えます。</span></p></aside>
+      </div>
+    </section>
+
+    <section id="attendance-screen" aria-labelledby="attendance-title" hidden>
+      <div class="page-heading"><p class="eyebrow"><span data-i18n="attendanceEyebrow">参加する学生を確認</span></p><h1 id="attendance-title" tabindex="-1"><span data-i18n="attendanceTitle">今日の出欠</span></h1><p><span data-i18n="attendanceIntro">欠席する学生を押して除外してください。出席者だけでグループを作ります。</span></p></div>
+      <div class="panel attendance-panel">
+        <div class="toolbar"><p id="attendance-count" class="count" role="status"></p><div class="button-row"><button id="select-all" type="button"><span data-i18n="selectAll">全員出席</span></button><button id="deselect-all" type="button"><span data-i18n="deselectAll">全員欠席</span></button></div></div>
+        <div id="attendance-list" class="attendance-list"></div>
+      </div>
+      <form id="group-form" class="group-settings panel">
+        <div><label for="group-count"><span data-i18n="groupCount">グループ数</span></label><p class="hint"><span data-i18n="balanceHint">グループ間の人数差は最大1人です。</span></p></div>
+        <div class="stepper"><button id="decrease-groups" type="button" aria-label="グループ数を減らす" data-i18n-aria="decrease">−</button><input id="group-count" type="number" value="6" min="1" step="1" required aria-describedby="group-error"><button id="increase-groups" type="button" aria-label="グループ数を増やす" data-i18n-aria="increase">+</button></div>
+        <button type="submit" class="primary"><span data-i18n="makeGroups">グループ分け</span> <span aria-hidden="true">→</span></button>
+        <p id="group-error" class="error" role="alert"></p>
+      </form>
+      <button type="button" class="text-button edit-roster">← <span data-i18n="editRoster">名簿を編集</span></button>
+    </section>
+
+    <section id="results-screen" aria-labelledby="results-title" hidden>
+      <div class="results-heading"><div class="page-heading"><p class="eyebrow"><span data-i18n="resultsEyebrow">さあ、会話を始めましょう</span></p><h1 id="results-title" tabindex="-1"><span data-i18n="resultsTitle">今日のグループ分け</span></h1><p id="results-summary"></p></div><div class="button-row"><button class="edit-roster" type="button"><span data-i18n="editRoster">名簿を編集</span></button><button id="edit-attendance" type="button"><span data-i18n="editAttendance">出欠を編集</span></button><button id="reshuffle" class="primary" type="button"><span data-i18n="reshuffle">もう一度シャッフル</span></button></div></div>
+      <div id="groups" class="groups"></div>
+      <p id="results-status" class="hint" role="status"></p>
+    </section>
+  </main>
+  <footer><span aria-hidden="true">◈</span> <span data-i18n="privacy">入力した学生名簿はサーバーに送信・保存されず、このブラウザ内でのみ処理されます。</span></footer>
+</body>
+</html>
